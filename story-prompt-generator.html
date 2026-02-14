@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Storyteller's Grimoire - Generator Prompt Struktur Cerita</title>
+    <link rel="icon" type="image/png" href="iconmdn.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1e293b 0%, #581c87 50%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Magical particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: #fbbf24;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s infinite ease-in-out;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #fef3c7;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #fcd34d;
+            margin-bottom: 0.5rem;
+        }
+
+        .credits {
+            font-size: 0.9rem;
+            color: #d8b4fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panels */
+        .panel {
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-panel {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 4px solid #92400e;
+        }
+
+        .output-panel {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid #7c3aed;
+        }
+
+        .panel-header {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-panel .panel-header {
+            color: #78350f;
+        }
+
+        .output-panel .panel-header {
+            color: #d8b4fe;
+            justify-content: space-between;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #78350f;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #92400e;
+            border-radius: 0.5rem;
+            background: white;
+            font-family: 'Georgia', serif;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            background: white;
+            padding: 0.75rem;
+            border: 2px solid #92400e;
+            border-radius: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background: #fef3c7;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #6b21a8 0%, #581c87 100%);
+            color: #fef3c7;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(107, 33, 168, 0.4);
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6b21a8 100%);
+            transform: scale(1.02);
+        }
+
+        .generate-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #8b5cf6;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+        }
+
+        /* Output Area */
+        .output-container {
+            background: #020617;
+            border: 2px solid #7c3aed;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            min-height: 600px;
+            max-height: 800px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .output-content {
+            color: #4ade80;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #a78bfa;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-state svg {
+            width: 4rem;
+            height: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .hint-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px solid #7c3aed;
+            border-radius: 0.5rem;
+            color: #d8b4fe;
+            font-size: 0.9rem;
+        }
+
+        .hint-box strong {
+            color: #fbbf24;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #d8b4fe;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+        }
+
+        .footer .quote {
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        /* Scrollbar */
+        .output-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .output-container::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .output-container::-webkit-scrollbar-thumb {
+            background: #7c3aed;
+            border-radius: 4px;
+        }
+
+        .output-container::-webkit-scrollbar-thumb:hover {
+            background: #8b5cf6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Magical particles -->
+    <script>
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particle.style.animationDuration = (2 + Math.random() * 3) + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                The Storyteller's Grimoire
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                </svg>
+            </h1>
+            <p class="subtitle">Generator Prompt Struktur Cerita Sinematik</p>
+            <div class="credits">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <span>Berdasarkan prinsip Syd Field • Christopher Vogler • Karl Iglesias</span>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Input Panel -->
+            <div class="panel input-panel">
+                <h2 class="panel-header">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    Formulir Inkantasi Cerita
+                </h2>
+
+                <form id="storyForm">
+                    <!-- Cerita tentang apa -->
+                    <div class="form-group">
+                        <label for="cerita">Cerita tentang apa? *</label>
+                        <textarea 
+                            id="cerita" 
+                            name="cerita" 
+                            placeholder="Contoh: Seorang pemuda miskin yang menemukan kekuatan magis dan harus menyelamatkan kerajaannya dari ancaman kegelapan..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <!-- Genre -->
+                    <div class="form-group">
+                        <label for="genre">Genre *</label>
+                        <input 
+                            type="text" 
+                            id="genre" 
+                            name="genre" 
+                            placeholder="Contoh: Fantasy Adventure, Drama, Thriller, Romance"
+                            required
+                        />
+                    </div>
+
+                    <!-- Target Usia -->
+                    <div class="form-group">
+                        <label>Target Usia (pilih satu atau lebih)</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="usia1" name="targetUsia" value="Anak-anak (7-12)">
+                                <label for="usia1">Anak-anak (7-12)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="usia2" name="targetUsia" value="Remaja (13-17)">
+                                <label for="usia2">Remaja (13-17)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="usia3" name="targetUsia" value="Dewasa Muda (18-25)">
+                                <label for="usia3">Dewasa Muda (18-25)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="usia4" name="targetUsia" value="Dewasa (26+)">
+                                <label for="usia4">Dewasa (26+)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="usia5" name="targetUsia" value="Semua Usia">
+                                <label for="usia5">Semua Usia</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Budget -->
+                    <div class="form-group">
+                        <label>Target Budget (pilih satu atau lebih)</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="budget1" name="targetBudget" value="Low Budget (<$1M)">
+                                <label for="budget1">Low Budget (&lt;$1M)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="budget2" name="targetBudget" value="Medium Budget ($1M-$10M)">
+                                <label for="budget2">Medium Budget ($1M-$10M)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="budget3" name="targetBudget" value="High Budget ($10M-$50M)">
+                                <label for="budget3">High Budget ($10M-$50M)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="budget4" name="targetBudget" value="Blockbuster (>$50M)">
+                                <label for="budget4">Blockbuster (&gt;$50M)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Durasi -->
+                    <div class="form-group">
+                        <label for="durasi">Durasi *</label>
+                        <input 
+                            type="text" 
+                            id="durasi" 
+                            name="durasi" 
+                            placeholder="Contoh: 120 menit / 2 jam / Feature film / Short film 30 menit"
+                            required
+                        />
+                    </div>
+
+                    <!-- Sample Cerita -->
+                    <div class="form-group">
+                        <label for="sampelCerita">Subjek / Sample Cerita (opsional)</label>
+                        <textarea 
+                            id="sampelCerita" 
+                            name="sampelCerita" 
+                            placeholder="Contoh: Seperti Harry Potter tapi dengan setting Indonesia modern, atau terinspirasi dari Lord of the Rings dengan elemen budaya lokal..."
+                        ></textarea>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button type="submit" class="generate-btn">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Generate Prompt Magis
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="panel output-panel">
+                <div class="panel-header">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                        Hasil Prompt Tercipta
+                    </div>
+                    <button id="copyBtn" class="copy-btn" style="display: none;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Salin</span>
+                    </button>
+                </div>
+
+                <div class="output-container">
+                    <div id="outputContent" class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Halaman kosong menanti kisahmu...</p>
+                        <p style="font-size: 0.85rem; opacity: 0.75;">Isi formulir di sebelah kiri dan tekan tombol Generate untuk menciptakan prompt struktur cerita</p>
+                    </div>
+                </div>
+
+                <div id="hintBox" class="hint-box" style="display: none;">
+                    <p><strong>💡 Petunjuk:</strong> Salin prompt JSON di atas dan gunakan pada AI generator pilihan Anda (ChatGPT, Claude, dll) untuk mendapatkan struktur cerita lengkap dan detail.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="quote">"Setiap cerita hebat dimulai dengan struktur yang solid dan visi yang jelas."</p>
+            <p style="opacity: 0.75;">Alat ini menghasilkan prompt terstruktur - bukan cerita final. Gunakan output untuk AI generator lainnya.</p>
+            <p style="opacity: 0.75;">Adios - @Madhaaannn</p>
+        </div>
+    </div>
+
+    <script>
+        // Form submission handler
+        document.getElementById('storyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            const data = {
+                cerita: formData.get('cerita'),
+                genre: formData.get('genre'),
+                targetUsia: formData.getAll('targetUsia'),
+                targetBudget: formData.getAll('targetBudget'),
+                durasi: formData.get('durasi'),
+                sampelCerita: formData.get('sampelCerita') || 'Tidak ada'
+            };
+
+            // Generate prompt structure
+            const promptStructure = {
+                instruction: "Buatkan struktur cerita lengkap dengan detail berikut berdasarkan prinsip penulisan skenario dari Syd Field (Three-Act Structure), Christopher Vogler (Hero's Journey), dan Karl Iglesias (emotional engagement):",
+                story_parameters: {
+                    premise: data.cerita,
+                    genre: data.genre,
+                    target_audience: data.targetUsia.join(', ') || 'Tidak ditentukan',
+                    budget_range: data.targetBudget.join(', ') || 'Tidak ditentukan',
+                    duration: data.durasi,
+                    reference_story: data.sampelCerita
+                },
+                output_structure: {
+                    "1_logline": {
+                        description: "Satu kalimat yang merangkum seluruh cerita (karakter utama + tujuan + konflik + stakes)",
+                        max_length: "35-40 kata"
+                    },
+                    "2_premise": {
+                        description: "Premis dasar cerita dengan 'What if?' statement yang kuat",
+                        include: ["Situasi awal", "Konflik utama", "Pertanyaan dramatis"]
+                    },
+                    "3_false_belief": {
+                        description: "Kepercayaan keliru protagonis di awal cerita yang harus ditransformasi",
+                        include: [
+                            "Belief awal protagonis",
+                            "Mengapa belief ini muncul (latar belakang)",
+                            "Bagaimana belief ini menghalangi protagonis",
+                            "Truth yang akan dipelajari di akhir"
+                        ]
+                    },
+                    "4_synopsis": {
+                        description: "Ringkasan cerita 1-2 paragraf yang mencakup beginning, middle, end",
+                        length: "200-300 kata"
+                    },
+                    "5_three_act_structure": {
+                        act_1_setup: {
+                            pages: "Halaman 1-30 (durasi disesuaikan)",
+                            elements: [
+                                "Opening Image - gambaran dunia sebelum perjalanan",
+                                "Ordinary World - kehidupan normal protagonis",
+                                "Inciting Incident (page 10-12) - peristiwa yang mengubah segalanya",
+                                "Debate - protagonis ragu mengambil tantangan",
+                                "Plot Point 1 (page 25-30) - keputusan memasuki dunia baru"
+                            ]
+                        },
+                        act_2_confrontation: {
+                            pages: "Halaman 31-90",
+                            part_2a: {
+                                description: "Rising Action & Fun and Games",
+                                elements: [
+                                    "Tests, Allies, Enemies - protagonis belajar aturan dunia baru",
+                                    "B-Story dimulai (subplot relasi/romance)",
+                                    "Midpoint (page 50-60) - false victory atau false defeat, stakes naik"
+                                ]
+                            },
+                            part_2b: {
+                                description: "Complications & Darkest Hour",
+                                elements: [
+                                    "Bad Guys Close In - tekanan meningkat",
+                                    "All is Lost (page 75) - kehilangan besar",
+                                    "Dark Night of the Soul - momen terdalam keputusasaan",
+                                    "Plot Point 2 (page 85-90) - informasi baru/keputusan untuk bangkit"
+                                ]
+                            }
+                        },
+                        act_3_resolution: {
+                            pages: "Halaman 91-120",
+                            elements: [
+                                "Gathering the Team/New Plan - persiapan final",
+                                "Climax - konfrontasi akhir dengan antagonis/obstacle terbesar",
+                                "Resolution - loose ends diikat",
+                                "Closing Image - dunia setelah perjalanan (mirror dari opening)"
+                            ]
+                        }
+                    },
+                    "6_eight_sequence_breakdown": {
+                        description: "Pembagian cerita dalam 8 sequence (masing-masing ~12-15 menit/10-15 halaman)",
+                        sequences: [
+                            {
+                                sequence: 1,
+                                act: "Act 1",
+                                title: "Status Quo & Inciting Incident",
+                                focus: "Perkenalan dunia, karakter, dan masalah yang muncul",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 2,
+                                act: "Act 1",
+                                title: "Predicament & Lock In",
+                                focus: "Protagonis terdorong atau memilih memasuki konflik",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 3,
+                                act: "Act 2A",
+                                title: "First Obstacle & Raising Stakes",
+                                focus: "Tantangan pertama di dunia baru, membangun momentum",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 4,
+                                act: "Act 2A",
+                                title: "First Culmination & Midpoint",
+                                focus: "Pencapaian atau kegagalan signifikan pertama, game-changer",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 5,
+                                act: "Act 2B",
+                                title: "Subplot & Rising Complications",
+                                focus: "Subplot berkembang, komplikasi bertambah",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 6,
+                                act: "Act 2B",
+                                title: "Main Culmination & Lowest Point",
+                                focus: "Kegagalan terbesar, all is lost moment",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 7,
+                                act: "Act 3",
+                                title: "New Approach & Final Push",
+                                focus: "Bangkit dengan pemahaman baru, menuju klimaks",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            },
+                            {
+                                sequence: 8,
+                                act: "Act 3",
+                                title: "Climax & Resolution",
+                                focus: "Konfrontasi final dan resolusi emosional",
+                                beats: "Minimal 3 beat points dengan deskripsi detail setiap beat"
+                            }
+                        ],
+                        beat_requirements: "Setiap beat harus memiliki minimal 3 sub-beat dengan deskripsi spesifik (aksi, dialog key, perubahan emosi)"
+                    },
+                    "7_character_arc": {
+                        protagonist: {
+                            starting_point: "Karakter di awal (dengan false belief)",
+                            transformation_points: "Momen-momen kunci yang mengubah karakter",
+                            ending_point: "Karakter di akhir (dengan truth yang dipelajari)"
+                        },
+                        emotional_journey: "Pemetaan emosi protagonis dari sequence ke sequence"
+                    },
+                    "8_thematic_elements": {
+                        central_theme: "Tema utama cerita",
+                        moral_argument: "Argumen moral/filosofis yang diperdebatkan",
+                        symbols_motifs: "Simbol dan motif visual/naratif yang berulang"
+                    }
+                },
+                formatting_instructions: [
+                    "Gunakan bahasa Indonesia yang jelas dan profesional",
+                    "Setiap beat harus spesifik dengan aksi konkret, bukan abstrak",
+                    "Sertakan emotional beats - bagaimana audience seharusnya merasa",
+                    "Tunjukkan cause-and-effect antar sequence",
+                    "Pastikan false belief protagonis jelas tertransformasi di Act 3",
+                    "Untuk setiap sequence, breakdown menjadi minimal 3 beat dengan minimal 3 sub-beat per beat",
+                    "Gunakan prinsip 'show don't tell' dalam deskripsi"
+                ],
+                additional_notes: "Output ini adalah prompt terstruktur untuk digunakan pada AI generator lainnya. Jangan buat cerita final, tapi berikan detail yang cukup untuk menghasilkan cerita yang kaya dan kompleks."
+            };
+
+            // Display the generated prompt
+            const formattedPrompt = JSON.stringify(promptStructure, null, 2);
+            const outputDiv = document.getElementById('outputContent');
+            outputDiv.innerHTML = `<pre class="output-content">${formattedPrompt}</pre>`;
+            
+            // Show copy button and hint
+            document.getElementById('copyBtn').style.display = 'flex';
+            document.getElementById('hintBox').style.display = 'block';
+        });
+
+        // Copy button handler
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const outputText = document.querySelector('.output-content').textContent;
+            navigator.clipboard.writeText(outputText).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const span = btn.querySelector('span');
+                const originalText = span.textContent;
+                
+                btn.classList.add('copied');
+                span.textContent = 'Tersalin!';
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    span.textContent = originalText;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
